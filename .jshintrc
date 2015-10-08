@@ -1,0 +1,6 @@
+{
+  "indent": 2,
+  "asi":true,
+  "sub":true,
+  "predef" : ["exports"]
+}
