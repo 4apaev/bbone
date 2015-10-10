@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset='UTF-8'>
+    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+    <meta name='viewport' content='width=device-width'>
+    <title>bbone test</title>
+
+    <script>
+      function call(method) {
+        return Function.prototype.call.bind(method);
+      }
+      var log = console.log.bind(console);
+      var own = call({}.hasOwnProperty)
+      var logger=function(msg){
+        return function(){
+          log(msg, arguments)
+        }
+      }
+
+    </script>
+    <script src="dist/bbone.js"></script>
+
+  </head>
+
+  <body></body>
+</html>

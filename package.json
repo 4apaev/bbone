@@ -11,18 +11,18 @@
     "url": "git@github.com:4apaev/sync.git"
   },
   "scripts": {
-    "preinstall": "npm link express jade mocha should browserify",
+    "preinstall": "npm link mocha should browserify uglify-js",
+    "start":"python -m SimpleHTTPServer 3000",
+    "test": "mocha tests/bbone.js",
 
-    "build:00": "browserify -t babelify ./src/vent.js | uglifyjs -o ./dist/vent.min.js --screw-ie8 -c",
-    "build:01": "browserify -t babelify ./src/vent.js | uglifyjs -o ./dist/vent.js -b --screw-ie8 -c",
-    "build:10": "browserify -t babelify ./src/vent.js --standalone Vent | uglifyjs -o ./dist/evt.min.js --screw-ie8 -c",
-    "build:11": "browserify -t babelify ./src/vent.js --standalone Vent | uglifyjs -o ./dist/evt.js -b --screw-ie8 -c",
-    "build": "npm run build:00 && npm run build:01 && npm run build:10 && npm run build:11",
+    "build:bbone": "browserify -t babelify ./bbone.js --standalone bbone  | uglifyjs -o ./dist/bbone.js  -b indent-level=2",
+    "build:vent": "browserify -t babelify ./src/vent.js | uglifyjs -o ./dist/vent.js -b indent-level=2",
 
-    "test": "mocha tests/vent.js"
+    "build": "npm run build:bbone && npm run test"
   },
   "dependencies": {},
   "devDependencies": {
+    "browserify": "latest",
     "babelify": "latest",
     "mocha": "latest",
     "should": "latest",

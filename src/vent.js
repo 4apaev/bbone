@@ -1,44 +1,50 @@
-var inherits = require('./base').inherits
+var inherits = require('./inherits')
+var defines = require('./defines')
 
+module.exports = Vent;
 function Vent() {
-    this.vents=Object.create(null)
+    var uid = Math.random().toString(36).slice(2);
+    var vents = Vent.store[uid] = Object.create(null);
+    defines(this, '000:value:uid', uid);
+    defines(this, '100:get:vents', function(){ return vents });
+    defines(this, '100:set:vents', function(x){ vents = x; });
   }
 
-inherits(Vent, inherits);
+Vent.store=Object.create(null);
+inherits(Vent);
 
 Vent.use('on', function(type, fx, ctx) {
     return (this.vents[type]||(this.vents[type]=[])).push({ fx: fx, ctx: ctx}), this;
-  }).use('off', function(type, fx) {
+  })
+
+Vent.use('off', function(type, fx) {
     switch(arguments.length) {
-      case 0: this.vents = {}; break;
+      case 0: this.vents = Object.create(null); break;
       case 1: delete this.vents[type]; break;
       default:
-        var arr = type in this.vents && this.vents[type]
+        var arr = this.vents[type]
         if(arr) {
             var x, i = -1;
             while(x=arr[++i])
               fx === x.fx && (arr.splice(i, 1), i--);
           }}
     return this;
-  }).use('emit', function(type) {
-    var arr = type in this.vents && this.vents[type]
+  })
+
+Vent.use('emit', function(type) {
+    var arr = this.vents[type]
     if(arr) {
         var x, i = -1, argv = [].slice.call(arguments, 1);
         while(x=arr[++i])
           x.fx.apply(x.ctx, argv);
       }
     return this;
-  }).use('once', function(type, fx, ctx) {
-    this.on(type, function() {
-      fx.apply(ctx, arguments)
-      this.off(type, arguments.callee);
-    }, this);
-    return this;
   })
 
-module.exports = Vent;
-
-
-    // def(this, '101:value:vents', Object.create(null));
-// if(typeof exports=='object'&&typeof module!='undefined'){module.exports=Vent;}else if(typeof define=='function'){define([],function(){return Vent})}else{root.Vent=Vent;}
-// browserify src/vent.js -t babelify --standalone Vent | uglifyjs -o dist/vent.js -b -i 2
+Vent.use('once', function(type, fx, ctx) {
+    this.on(type, function tmp() {
+      fx.apply(ctx, arguments)
+      this.off(type, tmp);
+    }, this);
+    return this;
+  });
