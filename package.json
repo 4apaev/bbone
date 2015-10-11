@@ -13,12 +13,11 @@
   "scripts": {
     "preinstall": "npm link mocha should browserify uglify-js",
     "start":"python -m SimpleHTTPServer 3000",
-    "test": "mocha tests/bbone.js",
-
-    "build:bbone": "browserify -t babelify ./bbone.js --standalone bbone  | uglifyjs -o ./dist/bbone.js  -b indent-level=2",
-    "build:vent": "browserify -t babelify ./src/vent.js | uglifyjs -o ./dist/vent.js -b indent-level=2",
-
-    "build": "npm run build:bbone && npm run test"
+    "test": "mocha tests/main.js",
+    "build:dev": "browserify -t [ babelify --loose all ] -d -e ./bbone.js -s bbone -o ./dist/bbone.js",
+    "build:prod": "browserify -t [ babelify --loose all ] ./bbone.js -s bbone | uglifyjs -o ./dist/bbone.js",
+    "build:bbone": "browserify -t [ babelify --loose all ] ./bbone.js -s bbone | uglifyjs -o ./dist/bbone.js  -b indent-level=2",
+    "build": "npm run build:dev && npm run test"
   },
   "dependencies": {},
   "devDependencies": {

@@ -1,14 +1,16 @@
 var defines = require('./defines');
+var inherits = require('./inherits');
 var Vent = require('./vent');
 
-module.exports = Vent.extend({
+module.exports = Egg;
+function Egg() {
+  Vent.call(this);
+  defines(this, 'shell', Object.create(null));
+}
 
-  constructor:function Egg() {
-    this.constructor.super.call(this);
-    defines(this, 'shell', Object.create(null));
-  },
+inherits(Egg, Vent);
 
-  set: function(a, b){
+Egg.use('set', function(a, b){
     if('object'=== typeof a && a) {
       for(var k in a)
         this.set(k, a[k]);
@@ -20,21 +22,18 @@ module.exports = Vent.extend({
           e = 'create';}
         if(e){
           this.shell[a]=b;
-          this.emit(e, a, b); }}
+          this.emit(e, a, b);
+        }}
     return this;
-  },
+  });
 
-  unset: function(x){
+Egg.use('unset', function(x){
     if(this.has(x)) {
       var v = this.get(x);
       delete this.shell[x];
       this.emit('delete', x, v); }
     return this;
-  },
-  get: function(x){
-      return this.shell[x];
-    },
-  has: function(x){
-      return x in this.shell;
-    }
-})
+  });
+
+Egg.use('get', function(x){ return this.shell[x] });
+Egg.use('has', function(x){ return x in this.shell });

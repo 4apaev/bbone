@@ -5,13 +5,16 @@
     <meta http-equiv='X-UA-Compatible' content='IE=edge'>
     <meta name='viewport' content='width=device-width'>
     <title>bbone test</title>
-
     <script>
       function call(method) {
         return Function.prototype.call.bind(method);
       }
+
       var log = console.log.bind(console);
       var own = call({}.hasOwnProperty)
+      var slice = call([].slice)
+      var tos = call({}.toString)
+
       var logger=function(msg){
         return function(){
           log(msg, arguments)
