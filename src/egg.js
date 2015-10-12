@@ -3,9 +3,11 @@ var inherits = require('./inherits');
 var Vent = require('./vent');
 
 module.exports = Egg;
-function Egg() {
+function Egg(prop) {
   Vent.call(this);
   defines(this, 'shell', Object.create(null));
+  if(prop)
+    defines.alias(this, 'shell', prop)
 }
 
 inherits(Egg, Vent);
@@ -16,8 +18,8 @@ Egg.use('set', function(a, b){
         this.set(k, a[k]);
     } else {
         var e;
-        if(a in this.shell){
-          this.shell[a] !=b && (e = 'change');
+        if(this.has(a)){
+          this.get(a) !=b && (e = 'change');
         } else {
           e = 'create';}
         if(e){
@@ -37,3 +39,10 @@ Egg.use('unset', function(x){
 
 Egg.use('get', function(x){ return this.shell[x] });
 Egg.use('has', function(x){ return x in this.shell });
+
+Egg.use('each', function(fn, ctx){
+  ctx||(ctx=this)
+  for(var k in this.shell)
+    fn.call(ctx, this.shell[k], k, this.shell);
+  return this;
+});

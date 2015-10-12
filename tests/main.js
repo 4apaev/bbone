@@ -1,6 +1,7 @@
 global.log = console.log.bind(console)
 global.should = require('should')
-global.assert = require('assert')
+global.sinon = require('sinon');
+require('should-sinon')
 
 require('./base')
 require('./vent')

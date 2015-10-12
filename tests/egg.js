@@ -6,6 +6,24 @@ describe('Egg', function() {
   it('should be instance of Egg and Vent', function() { egg.should.be.an.instanceof(Vent).and.instanceof(Vent) })
 })
 
+describe('Egg:alias', function() {
+  var egg = new Egg('attrs');
+  it('should alias default getter `shell` to -> `attrs`', function() {
+    egg.should.have.property('attrs').and.be.equal(egg.shell)
+  })
+
+  it('should set `attrs`', function() {
+    egg.set('a', 1)
+    egg.should.have.propertyByPath('attrs','a').and.be.equal(egg.shell.a)
+  })
+
+  it('should unset `attrs`', function() {
+    delete egg.attrs.a
+    egg.should.have.property('attrs').and.be.empty()
+  })
+
+})
+
 describe('Egg:set', function() {
   var egg = new Egg;
   it('should set key val', function() { egg.set('a', 1).get('a').should.be.equal(1) })
@@ -30,5 +48,4 @@ describe('Egg:events', function() {
     called.should.be.false;
   })
   it('should emit `delete` event', function(cb) { egg.once('delete', done(cb)).unset(x); })
-
 })

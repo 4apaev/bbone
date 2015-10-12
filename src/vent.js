@@ -1,5 +1,6 @@
 var inherits = require('./inherits')
 var defines = require('./defines')
+var Base = require('./base')
 var slice = [].slice
 
 module.exports = Vent;
@@ -12,9 +13,11 @@ function Vent() {
   }
 
 Vent.store=Object.create(null);
-inherits(Vent);
+inherits(Vent, Base);
 
 Vent.use('on', function(type, fx, ctx) {
+    if(arguments.length < 2)  //||''+type!=type
+      this.fail('missing arguments',1);
     return (this.vents[type]||(this.vents[type]=[])).push({ fx: fx, ctx: ctx }), this;
   })
 

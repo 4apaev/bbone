@@ -1,5 +1,11 @@
 #!/bin/bash
 
+browserify -t [ babelify --loose all ] src/sync.js -s Sync -o dist/sync.js
+browserify -t [ babelify --loose all ] src/egg.js -s Egg -o dist/egg.js
+browserify -t [ babelify --loose all ] src/vent.js -s Vent -o dist/vent.js
+browserify -t [ babelify --loose all ] lib/is.js -s is | uglifyjs -o dist/is.js --screw-ie8 -c
+
+
 # browserify -t babelify ./src/emmiter.js --standalone bbone | uglifyjs -o ./dist/emmiter.js  -b indent-level=2
 # browserify -d -e ./src/model.js -t babelify -o ./dist/bbone-es6.js
 
@@ -9,7 +15,7 @@
 
 # browserify -d -e ./bbone.js -t [ babelify --loose all ] -o ./dist/bbone.js
 # browserify -t [ babelify --loose all ] -d -e ./bbone.js -s bbone | uglifyjs -o ./dist/bbone.js  -b indent-level=2
-browserify -t [ babelify --loose all ] -d -e ./bbone.js -s bbone -o ./dist/bbone.js
+# browserify -t [ babelify --loose all ] -d -e ./bbone.js -s bbone -o ./dist/bbone.js
 
 # browserify -d -e ./bbone-es6.js -t [ babelify --loose all ] -o ./dist/bbone-es6.js
 # browserify -d -e ./src/model.js -t [ babelify --loose es6.classes,es6.properties.computed ] -o ./dist/model.js

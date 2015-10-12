@@ -11,3 +11,7 @@ function defines(obj, str, fnc) {
   Object.defineProperty(obj, name, desc)
   return obj;
 }
+defines(defines, 'value:alias', function alias(src, name, nikname) {
+  var desc = Object.getOwnPropertyDescriptor(src, name);
+  desc && Object.defineProperty(src, nikname, desc);
+})
