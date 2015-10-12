@@ -8,8 +8,8 @@ function Vent() {
     var uid = Math.random().toString(36).slice(2);
     Vent.store[uid] = Object.create(null);
     defines(this, '000:value:uid', uid);
-    defines(this, '100:get:vents', function(){ return Vent.store[uid] });
-    defines(this, '100:set:vents', function(x){ Vent.store[uid] = x; });
+    defines(this, '100:get:vents', ()=> Vent.store[uid]);
+    defines(this, '100:set:vents', x=> Vent.store[uid]=x);
   }
 
 Vent.store=Object.create(null);
