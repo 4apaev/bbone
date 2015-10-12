@@ -37,12 +37,15 @@ Sync.use('end', function(cb, ctx) {
   var xhr = this.xhr = new XMLHttpRequest;
   xhr.open(this.method.toUpperCase(), this.url, true);
 
-  xhr.onreadystatechange=() => 4===xhr.readyState && this.emit('done', this.parse(xhr).error, this.response, this);
+  xhr.onreadystatechange=() => 4===xhr.readyState &&
+    this.parse(xhr).emit(this.error
+                         ? 'error'
+                         : 'done', this.error, this.response, this);
 
   for(var k in this.headers)
     xhr.setRequestHeader(k, this.get(k));
 
-  cb&&'function'==typeof cb&&this.once('done', cb, ctx);
+  cb&&'function'==typeof cb&&this.once('done', cb, ctx).once('error', cb, ctx);
 
   xhr.send(this.data);
   return this;
