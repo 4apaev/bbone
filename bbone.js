@@ -1,5 +1,5 @@
 module.exports = {
-  Sync: require('./src/sync'),
+  sync: require('./src/sync'),
   Egg: require('./src/egg'),
   Vent: require('./src/vent'),
   defines: require('./src/defines'),

@@ -1,13 +1,17 @@
 var Egg = require('./egg');
 var inherits = require('./inherits');
+var defines = require('./defines');
 var types = {form:'x-www-form-urlencoded',json:'application/json',text:'text/plain',html:'text/html'};
+var methods = ['get','post','put','delete'];
 
-module.exports = Sync;
+module.exports = sync;
+
 function Sync(method, url) {
   Egg.call(this, 'headers')
   this.url = url;
   this.method = method.toLowerCase();
 }
+
 inherits(Sync, Egg)
 
 Sync.use('send',function(data) {
@@ -23,23 +27,23 @@ Sync.use('send',function(data) {
 })
 
 Sync.use('serialize', function(x) {
-  return Object.keys(x).map(function(k) {
-    return [k,x[k]].map(encodeURIComponent).join('='); }).join('&')
+  return Object.keys(x).map(k => [k,x[k]].map(encodeURIComponent).join('=')).join('&')
 })
 
 Sync.use('type', function(x) {
   return x ? this.set('content-type', types[x.toLowerCase()]||x) : this.get('content-type'); })
 
-Sync.use('end', function() {
+Sync.use('end', function(cb, ctx) {
   var xhr = this.xhr = new XMLHttpRequest;
   xhr.open(this.method.toUpperCase(), this.url, true);
-  xhr.onreadystatechange=function() {
-    if(4!=xhr.readyState) return;
-    this.emit('done', this.parse(xhr).error, this.response, this)
-  }.bind(this)
+
+  xhr.onreadystatechange=() => 4===xhr.readyState && this.emit('done', this.parse(xhr).error, this.response, this);
 
   for(var k in this.headers)
-    xhr.setRequestHeader(k, this.get(k))
+    xhr.setRequestHeader(k, this.get(k));
+
+  cb&&'function'==typeof cb&&this.once('done', cb, ctx);
+
   xhr.send(this.data);
   return this;
 })
@@ -51,3 +55,15 @@ Sync.use('parse', function(xhr) {
   this.response = -1===xhr.getAllResponseHeaders().indexOf('json') ? xhr.response : JSON.parse(xhr.response);
   return this;
 })
+
+function sync(method, url) { return new sync.Sync(method, url) }
+
+defines(sync, '100:value:Sync', Sync)
+
+methods.forEach(method => {
+  defines(sync, `101:value:${method}`, (url, data, cb, ctx)=>{
+    var req = sync(method, url)
+    if('function'==typeof data) cb=data, data=null;
+    if(data) req.send(data);
+    if('function'==typeof cb) req.end(cb, ctx);
+    return req; })})
