@@ -1,9 +1,9 @@
 #!/bin/bash
 
-browserify -t [ babelify --loose all ] src/sync.js -s Sync -o dist/sync.js
-browserify -t [ babelify --loose all ] src/egg.js -s Egg -o dist/egg.js
-browserify -t [ babelify --loose all ] src/vent.js -s Vent -o dist/vent.js
-browserify -t [ babelify --loose all ] lib/is.js -s is | uglifyjs -o dist/is.js --screw-ie8 -c
+browserify -t [ babelify --loose all ] src/agent.js -s agent -o dist/agent.js
+# browserify -t [ babelify --loose all ] src/egg.js -s Egg -o dist/egg.js
+# browserify -t [ babelify --loose all ] src/vent.js -s Vent -o dist/vent.js
+# browserify -t [ babelify --loose all ] lib/is.js -s is | uglifyjs -o dist/is.js --screw-ie8 -c
 
 
 # browserify -t babelify ./src/emmiter.js --standalone bbone | uglifyjs -o ./dist/emmiter.js  -b indent-level=2
