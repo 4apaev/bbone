@@ -1,7 +1,6 @@
-module.exports = {
-  sync: require('./src/sync'),
-  Egg: require('./src/egg'),
-  Vent: require('./src/vent'),
-  defines: require('./src/defines'),
-  inherits: require('./src/inherits')}
-  // is: require('./lib/is')
+module.exports.defines = require('./src/defines')
+module.exports.inherits = require('./src/inherits')
+module.exports.Vent = require('./src/vent')
+module.exports.Egg = require('./src/egg')
+module.exports.List = require('./src/list')
+module.exports.sync = require('./sync')

@@ -1,3 +1,4 @@
+"strict mode"
 var inherits = require('./inherits')
 var defines = require('./defines')
 var Base = require('./base')
@@ -5,7 +6,7 @@ var slice = [].slice
 
 module.exports = Vent;
 function Vent() {
-    var uid = Math.random().toString(36).slice(2);
+    let uid = Math.random().toString(36).slice(2);
     Vent.store[uid] = Object.create(null);
     defines(this, '000:value:uid', uid);
     defines(this, '100:get:vents', ()=> Vent.store[uid]);
@@ -16,9 +17,11 @@ Vent.store=Object.create(null);
 inherits(Vent, Base);
 
 Vent.use('on', function(type, fx, ctx) {
-    if(arguments.length < 2)  //||''+type!=type
+    if(arguments.length < 2)
       this.fail('missing arguments',1);
-    return (this.vents[type]||(this.vents[type]=[])).push({ fx: fx, ctx: ctx }), this;
+    let o = { fx, ctx }
+    type.split(/\s+/g).forEach(e => (this.vents[e]||(this.vents[e]=[])).push(o));
+    return this;
   })
 
 Vent.use('off', function(type, fx) {
@@ -34,9 +37,9 @@ Vent.use('off', function(type, fx) {
   })
 
 Vent.use('emit', function(type) {
-    var arr = this.vents[type]
+    let arr = this.vents[type]
     if(arr) {
-        var x, i = -1, argv = slice.call(arguments, 1);
+      let x, i = -1, argv = slice.call(arguments, 1);
         while(x=arr[++i])
           x.fx.apply(x.ctx, argv);
       }

@@ -1,4 +1,6 @@
+"strict mode"
 var defines = require('./defines');
+var alias = require('./alias');
 var inherits = require('./inherits');
 var Vent = require('./vent');
 
@@ -7,7 +9,7 @@ function Egg(prop) {
   Vent.call(this);
   defines(this, 'shell', Object.create(null));
   if(prop)
-    defines.alias(this, 'shell', prop)
+    alias(this, 'shell', prop)
 }
 
 inherits(Egg, Vent);
@@ -39,10 +41,3 @@ Egg.use('unset', function(x){
 
 Egg.use('get', function(x){ return this.shell[x] });
 Egg.use('has', function(x){ return x in this.shell });
-
-Egg.use('each', function(fn, ctx){
-  ctx||(ctx=this)
-  for(var k in this.shell)
-    fn.call(ctx, this.shell[k], k, this.shell);
-  return this;
-});
