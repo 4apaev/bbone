@@ -10,3 +10,7 @@ Base.prototype.fail = function fail(msg, cast) {
   if(cast) throw err;
   return err;
 }
+
+Base.prototype.delay = function(fn, tm) {
+  return setTimeout(Function.bind.apply(fn, [].slice.call(arguments, 2)), tm)
+}

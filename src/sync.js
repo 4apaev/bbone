@@ -41,6 +41,18 @@ Sync.use('end', function(cb,ctx) {
   return this;
 })
 
+Sync.use('pipe', function() {
+    var self = this;
+    return new Promise(function(resolve, reject){
+      self.end(function(err, data) {
+        if(err)
+          reject(err);
+        else
+          resolve(data);
+        })
+      })
+  })
+
 Sync.use('parse', function(xhr) {
   this.error = 200!=xhr.status ? this.fail(xhr.statusText) : null;
   this.response = 'application/json'===xhr.getResponseHeader('Content-Type')
@@ -56,3 +68,4 @@ Sync.use('serialize', function(x) {
 Sync.use('type', function(x) {
   return x ? this.set('content-type', types[x.toLowerCase()]||x) : this.get('content-type');
 })
+

@@ -1,4 +1,3 @@
-"strict mode"
 var inherits = require('./inherits')
 var defines = require('./defines')
 var Base = require('./base')
@@ -39,7 +38,7 @@ Vent.use('off', function(type, fx) {
 Vent.use('emit', function(type) {
     let arr = this.vents[type]
     if(arr) {
-      let x, i = -1, argv = slice.call(arguments, 1);
+        let x, i = -1, argv = slice.call(arguments, 1);
         while(x=arr[++i])
           x.fx.apply(x.ctx, argv);
       }

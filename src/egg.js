@@ -1,4 +1,3 @@
-"strict mode"
 var defines = require('./defines');
 var alias = require('./alias');
 var inherits = require('./inherits');
