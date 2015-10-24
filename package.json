@@ -11,16 +11,19 @@
     "url": "git@github.com:4apaev/bbone.git"
   },
   "scripts": {
-    "preinstall": "npm link mocha should browserify uglify-js",
-    "start": "python -m SimpleHTTPServer 3000",
+    "preinstall": "npm link express jade mocha should browserify uglify-js",
+    "start": "node index",
     "test": "mocha tests/main.js",
-    "build:dev": "browserify -t [ babelify --loose all ] bbone.js -d -s bbone -o dist/bbone.js",
-    "build:prod": "browserify -t [ babelify --loose all ] bbone.js -s bbone | uglifyjs -m -c -o dist/bbone.min.js",
-    "build:bbone": "browserify -t [ babelify --loose all ] bbone.js -s bbone | uglifyjs -o dist/bbone.js -b indent-level=2",
+    "build:dev": "browserify -t [ babelify --loose all ] lib/bbone.js -d -s bbone -o dist/bbone.js",
+    "build:prod": "browserify -t [ babelify --loose all ] lib/bbone.js -s bbone | uglifyjs -m -c -o dist/bbone.min.js",
+    "build:bbone": "browserify -t [ babelify --loose all ] lib/bbone.js -s bbone | uglifyjs -o dist/bbone.js -b indent-level=2",
     "build": "npm run build:dev && npm run test"
   },
   "dependencies": {},
   "devDependencies": {
+    "express": "latest",
+    "body-parser": "latest",
+    "jade": "latest",
     "babelify": "latest",
     "browserify": "latest",
     "mocha": "latest",
