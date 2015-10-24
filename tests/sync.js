@@ -16,7 +16,73 @@ describe('sync', function() {
                 .and.instanceof(bbone.Egg)
                 .and.instanceof(sync.Sync);
   })
+})
 
 
+describe('sync:send', function() {
+  var data = {a:1,b:2};
+  var str = JSON.stringify(data)
+  ;[{
+    prop: 'url',
+    method: 'get',
+    type: 'x-www-form-urlencoded',
+    expect: '/?a=1&b=2'
+  },{
+    prop: 'data',
+    method: 'post',
+    type: 'application/json',
+    expect: str
+  },{
+    prop: 'data',
+    method: 'put',
+    type: 'application/json',
+    expect: str
+  },{
+    prop: 'data',
+    method: 'delete',
+    type: 'application/json',
+    expect: str
+  }].forEach(function(o) {
 
+    var req = sync[o.method]('/').send(data)
+
+    it(`should serialize "${o.method}" data`, function() {
+      req.should.have.property(o.prop).and.be.equal(o.expect)
+    })
+
+    it(`should set content-type header to "${o.type}"`, function() {
+      req.type().should.be.equal(o.type);
+    })
+
+  })
+})
+
+describe('sync: serialize', function() {
+  var url = 'api',
+      query = 'a=1&b=2',
+      data = {a:1,b:2},
+      req = sync.get(url);
+
+  it('should not throw being called with arguments other than object', function(done) {
+    try {
+      req.serialize();
+    } catch(e) {
+      return done(e);
+    }
+    done();
+  })
+
+  it('should return serialized data', function() {
+    req.serialize(data).should.be.exactly(query);
+  })
+
+  req.send(data)
+
+  it('should append serialized data to url', function() {
+    req.url.should.be.exactly(`${url}?${query}`);
+  })
+
+  it('should  set type to x-www-form-urlencoded', function() {
+    req.type().should.be.exactly('x-www-form-urlencoded');
+  })
 })
