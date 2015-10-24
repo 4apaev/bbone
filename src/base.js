@@ -14,3 +14,9 @@ Base.prototype.fail = function fail(msg, cast) {
 Base.prototype.delay = function(fn, tm) {
   return setTimeout(Function.bind.apply(fn, [].slice.call(arguments, 2)), tm)
 }
+
+Base.prototype.dial = function(fn) {
+  return function() {
+      return fn.call.apply(fn, arguments)
+  }
+}
