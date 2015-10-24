@@ -1,6 +1,0 @@
-module.exports.defines = require('./src/defines')
-module.exports.inherits = require('./src/inherits')
-module.exports.Vent = require('./src/vent')
-module.exports.Egg = require('./src/egg')
-module.exports.List = require('./src/list')
-module.exports.sync = require('./sync')
