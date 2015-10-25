@@ -11,9 +11,8 @@ describe('sync', function() {
     sync.should.have.property('delete').and.be.Function
   })
 
-  it('should be instance of Vent, Egg and sync.Sync', function() {
+  it('should be instance of Vent, and sync.Sync', function() {
     req.should.be.an.instanceof(bbone.Vent)
-                .and.instanceof(bbone.Egg)
                 .and.instanceof(sync.Sync);
   })
 })
@@ -25,7 +24,7 @@ describe('sync:send', function() {
   ;[{
     prop: 'url',
     method: 'get',
-    type: 'x-www-form-urlencoded',
+    type: 'application/x-www-form-urlencoded',
     expect: '/?a=1&b=2'
   },{
     prop: 'data',
@@ -58,8 +57,8 @@ describe('sync:send', function() {
 })
 
 describe('sync: serialize', function() {
-  var url = 'api',
-      query = 'a=1&b=2',
+  var url = '/api',
+      query = '/api?a=1&b=2',
       data = {a:1,b:2},
       req = sync.get(url);
 
@@ -79,10 +78,10 @@ describe('sync: serialize', function() {
   req.send(data)
 
   it('should append serialized data to url', function() {
-    req.url.should.be.exactly(`${url}?${query}`);
+    req.url.should.be.exactly(query);
   })
 
-  it('should  set type to x-www-form-urlencoded', function() {
-    req.type().should.be.exactly('x-www-form-urlencoded');
+  it('should  set type to application/x-www-form-urlencoded', function() {
+    req.type().should.be.exactly('application/x-www-form-urlencoded');
   })
 })

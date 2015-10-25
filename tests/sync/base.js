@@ -34,7 +34,7 @@
 
   describe('sync: serialize', function() {
     var url = 'api',
-        query = 'a=1&b=2',
+        query = 'api?a=1&b=2',
         data = {a:1,b:2},
         req = sync.get(url);
 
@@ -54,11 +54,11 @@
     req.send(data)
 
     it('should append serialized data to url', function() {
-      Should(req.url).be.exactly(`${url}?${query}`);
+      Should(req.url).be.exactly(query);
     })
 
-    it('should  set type to x-www-form-urlencoded', function() {
-      Should(req.type()).be.exactly('x-www-form-urlencoded');
+    it('should  set type to ' + types.form, function() {
+      Should(req.type()).be.exactly(types.form);
     })
   })
 
@@ -70,8 +70,8 @@
       it(method + ' send: should self return', function() {
         Should(req.send({a:1,b:2})).be.exactly(req); })
 
-      it(method + ' send: should set type to application/json', function() {
-        Should(req.type()).be.exactly('application/json');
+      it(method + ' send: should set type to ' + types.json, function() {
+        Should(req.type()).be.exactly(types.json);
       })
 
       it(method + ' send: should have `data` field', function() {
@@ -95,4 +95,4 @@
 
 })(bbone.sync,
 ['get','post','put','delete'],
-{form:'x-www-form-urlencoded',json:'application/json',text:'text/plain',html:'text/html'})
+{form:'application/x-www-form-urlencoded',json:'application/json',text:'text/plain',html:'text/html'})

@@ -100,10 +100,10 @@
       req.on('before', function(obj){
         Should(obj.set('Authorization', 'kekeke')).be.exactly(req);
       })
-      Should(req.headers).be.empty();
+      Should(req.get()).be.empty();
 
       req.end(function() {
-        Should(req.headers).have.property('Authorization', 'kekeke');
+        Should(req.get()).have.property('Authorization', 'kekeke');
         done()
       })
     })
