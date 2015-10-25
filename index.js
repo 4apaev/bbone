@@ -1,9 +1,14 @@
-var log = console.log.bind(console)
-var port = 5000
-var attrs='method,url,path,params,query,headers,body,cookies'.split(',')
-var express = require('express')
-var bodyParser = require('body-parser')
-var app = express()
+'use strict';
+let fs = require('fs')
+let express = require('express')
+let bodyParser = require('body-parser')
+let app = express()
+let port = 5000
+let attrs='method,url,path,params,query,headers,body,cookies'.split(',')
+let log = console.log.bind(console)
+let now = () => new Date().toTimeString().match(/[^\s]+/).pop()
+let fail = code => (req, res) => res.status(code).json({message: 'error code ' + code})
+let read = x => fs.createReadStream(`${__dirname}/${x}`)
 
 app.set('view engine', 'jade')
 app.set('views', './view')
@@ -16,12 +21,9 @@ app.use(function(req, res, next) {
 
 app.use(express.static('.'))
 app.use(bodyParser.json())
-app.use(function (err, req, res, next) { res.status(500)});
+app.use((err, req, res, next) => res.status(500));
 
-
-app.get('/', function(req, res) {
-  res.render('index')
-})
+app.get('/', (req, res) => res.render('index'))
 
 
 app.all('/api', echo)
@@ -33,22 +35,13 @@ app.all('/api/404', fail(404))
 app.all('/api/500', fail(500))
 
 
+app.get('/api/lib/:name', (req, res) => read(`node_modules/${req.params.name}/package.json`).pipe(res.type('json')))
+
 app.listen(port)
 
-
 function echo(req, res) {
-  res.status(200).json(attrs.reduce(function(m, k) {
+  res.status(200).json(attrs.reduce((m, k) => {
     m[k]=req[k]
     return m;
   }, {}));
-}
-
-function fail(code) {
-  return function(req, res) {
-    return res.status(code).json({message: 'error code ' + code})
-  }
-}
-
-function now() {
-  return new Date().toTimeString().match(/[^\s]+/).pop()
 }

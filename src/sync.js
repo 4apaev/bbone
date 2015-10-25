@@ -1,71 +1,72 @@
-var Egg = require('./egg');
-var inherits = require('./inherits');
-var types = { form:'x-www-form-urlencoded', json:'application/json', text:'text/plain', html:'text/html'}
-
+let Vent = require('./vent');
+let inherits = require('./inherits');
+let serialize = require('./sync/serialize');
+let map = {auth:'Authorization', type: 'Content-Type'}
+let types = {form:'application/x-www-form-urlencoded', json:'application/json', text:'text/plain', html:'text/html'}
+let key = x => x in map ? map[x] : x in types ? types[x] : x;
 module.exports = Sync;
 
 function Sync(method, url) {
-  Egg.call(this, 'headers')
+  Vent.call(this)
+  let head = Object.create(null)
+
   this.url = url;
-  this.method = method.toLowerCase();
-}
+  Sync.defines(this, '100:get:method', ()=> method.toUpperCase())
+  Sync.defines(this, '100:set:method', x => method=x)
 
-inherits(Sync, Egg)
-
-Sync.use('send',function(data) {
-  if(data) {
-    if('get'===this.method)
-      this.type('form').url += '?'+ this.serialize(data);
-    else if('object'===typeof data)
-      this.type('json').data = JSON.stringify(data);
+  this.get = x => x ? head[key(x)] : head;
+  this.set = (a,b) => {
+    if('object'===typeof a)
+      for(let k in a)
+        this.set(k, a[k]);
     else
-      this.data =''+data
+      head[key(a)] = key(b);
+    return this;
   }
-  return this;
-})
+}
+inherits(Sync, Vent)
 
-Sync.use('end', function(cb,ctx) {
-  let xhr = this.xhr = new XMLHttpRequest;
-  xhr.open(this.method.toUpperCase(), this.url, true);
-  xhr.onreadystatechange=() => {
-    if(4 != xhr.readyState) return
-    this.emit(this.parse(xhr).error
-              ? 'error finish'
-              : 'done finish', this.error, this.response).off();
-    cb && cb.call(ctx, this.error, this.response);
+Sync.use('send', function(x) { return this['object'===typeof x ? 'GET'===this.method ? 'query' : 'json' : 'text'](x) })
+    .use('json', function(x) { return setup.call(this, 'json', 'data', JSON.stringify, x) })
+    .use('query',function(x) { return setup.call(this, 'form', 'url', this.serialize.bind(this), x) })
+    .use('text', function(x) { return setup.call(this, 'text', 'data', String, x) })
+    .use('type', function(x) { return x ? this.set('type', x) : this.get('type') })
+    .use('before', function(fn, ctx) { return this.on('before', fn, ctx||this) })
+    .use('serialize', function(x) { return this.url=this.url.split('?').shift()+serialize(x)})
+
+  .use('end', function(cb,ctx) {
+    cb && this.once('finish', cb, ctx)
+    this.xhr = new XMLHttpRequest
+    this.xhr.open(this.method, this.url, true)
+    this.emit('before', this)
+    this.xhr.onload = this.parse.bind(this)
+
+    let head = this.get()
+    for(let k in head)
+      this.xhr.setRequestHeader(k, head[k]);
+    return this.xhr.send(this.data), this; })
+
+  .use('pipe', function() {
+    let end = this.end.bind(this);
+    return new Promise((resolve, reject) => end((err, res) => err ? reject(err) : resolve(res))); })
+
+
+  .use('parse', function() {
+    let xhr = this.xhr
+    let err = this.error = 200===xhr.status  ? null : this.fail(xhr.statusText);
+    let match = (''+xhr.getResponseHeader('content-type')).match(/\/([\w-]+)/)||[,'text']
+    let ctype = this.ctype = match[1];
+
+    let res = this.response = 'json'===ctype
+      ? 'object'===typeof xhr.response
+        ? xhr.response
+        : JSON.parse(xhr.response)
+      : xhr.response;
+    return this.emit(err ? 'error' : 'done', err, res).emit('finish', err, res);
+  });
+
+function setup(type, prop, fn, data) {
+    if(data!=null)
+      this.set('type', type)[prop] = fn(data)
+    return this
   }
-
-  for(var k in this.emit('before').headers)
-    xhr.setRequestHeader(k, this.get(k));
-  xhr.send(this.data);
-  return this;
-})
-
-Sync.use('pipe', function() {
-    var self = this;
-    return new Promise(function(resolve, reject){
-      self.end(function(err, data) {
-        if(err)
-          reject(err);
-        else
-          resolve(data);
-        })
-      })
-  })
-
-Sync.use('parse', function(xhr) {
-  this.error = 200!=xhr.status ? this.fail(xhr.statusText) : null;
-  this.response = 'application/json'===xhr.getResponseHeader('Content-Type')
-    ? JSON.parse(xhr.response)  : this.error
-      ? xhr.statusText : xhr.response;
-  return this;
-})
-
-Sync.use('serialize', function(x) {
-  return Object.keys(x).map(k => [k,x[k]].map(encodeURIComponent).join('=')).join('&')
-})
-
-Sync.use('type', function(x) {
-  return x ? this.set('content-type', types[x.toLowerCase()]||x) : this.get('content-type');
-})
-

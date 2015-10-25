@@ -1,4 +1,3 @@
-var defines = require('./defines');
 var alias = require('./alias');
 var inherits = require('./inherits');
 var Vent = require('./vent');
@@ -6,7 +5,7 @@ var Vent = require('./vent');
 module.exports = Egg;
 function Egg(prop) {
   Vent.call(this);
-  defines(this, 'shell', Object.create(null));
+  Egg.defines(this, 'shell', Object.create(null))
   if(prop)
     alias(this, 'shell', prop)
 }

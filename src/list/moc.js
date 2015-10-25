@@ -3,7 +3,5 @@ function moc(name, evt, res, val) {
     return function() {
       this.emit(evt, (val =func(this, arguments)));
       return res ? val : this;
-    }
-  }
-
+    }}
 module.exports = moc;
